@@ -2,6 +2,7 @@ import time
 from typing import Callable
 
 from exceptions import TaskTimeLimitError
+from custom_logger import logger
 
 
 def measure_execution_time(func: Callable):
@@ -34,8 +35,9 @@ def measure_execution_time(func: Callable):
         self.running_time += passed_time
 
         if self.running_time > self.max_running_time:
-            print(f'Функция превысела максимально возможное время исполнения '
-                  f'| {self.max_running_time} > {self.running_time}')
+            logger.error('Функция превысела максимально возможное время '
+                         'исполнения | %s > %s',
+                         self.max_running_time, self.running_time)
             raise TaskTimeLimitError
 
         return result

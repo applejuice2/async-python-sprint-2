@@ -7,6 +7,7 @@ from job import (Job,
                  JobStatus)
 from exceptions import (TaskTimeLimitError,
                         QueueFullOfElems)
+from custom_logger import logger
 
 
 class Scheduler:
@@ -29,7 +30,7 @@ class Scheduler:
         self.queue: deque[Job] = deque(maxlen=pool_size)
         self.file: str = file
         self.dependency_map = {}
-        print('Шедулер инициализирован')
+        logger.info('Шедулер инициализирован')
 
     def process_all_tasks(self, tasks: tuple[Job]) -> None:
         """
@@ -72,7 +73,7 @@ class Scheduler:
         """
         if len(self.queue) < self.queue.maxlen:
             self.queue.appendleft(task)
-            print(f'{task.id} добавлена в очередь')
+            logger.info('%s добавлена в очередь', task.id)
             if task.dependencies:
                 self.__start_dependency_service(task, self.dependency_map)
         else:
@@ -92,7 +93,7 @@ class Scheduler:
             self.__set_task_status_to_started(task)
 
             try:
-                print(f'Выполнение {task.id}')
+                logger.info('Выполнение %s', task.id)
                 task.run()
             except StopIteration:
                 task.status = JobStatus.FINISHED
@@ -109,12 +110,12 @@ class Scheduler:
                     self.__delete_dependency_task_from_map(task)
                     self.queue.pop()
                     yield
-                print(f'Ошибка при выполнении {task.id}: {e}')
+                logger.error('Ошибка при выполнении %s: %s', task.id, e)
                 continue
 
             self.queue.rotate(1)
 
-        print('Все задачи обработаны')
+        logger.info('Все задачи обработаны')
 
     def restart(self):
         """
@@ -174,8 +175,8 @@ class Scheduler:
             зависимостей.
         """
         for dependency in task.dependencies:
-            print(f'Найдена зависимая задача - {dependency}. '
-                  'Ожидание выполнения...')
+            logger.info('Найдена зависимая задача - %s. '
+                        'Ожидание выполнения...', dependency)
             if dependency not in dependency_map:
                 dependency_map[dependency] = []
             dependency_map[dependency].append(task)
@@ -195,7 +196,8 @@ class Scheduler:
             должна начинаться, иначе False.
         """
         if task.start_at and time.time() < task.start_at:
-            print(f'Задача {task.id} отложена. Время начала ещё не наступило.')
+            logger.info('Задача %s отложена. Время начала ещё не наступило.', 
+                  task.id)
             queue.rotate(1)
             return True
         return False
@@ -218,8 +220,8 @@ class Scheduler:
              for status in task.dependency_statuses.values()]
         )
         if not dependencies_completed:
-            print(f'Задача {task.id} отложена из-за '
-                  'невыполненных зависимостей.')
+            logger.info(f'Задача {task.id} отложена из-за '
+                         'невыполненных зависимостей.')
             task.status = JobStatus.POSTPONED
             queue.rotate(1)
             return True
