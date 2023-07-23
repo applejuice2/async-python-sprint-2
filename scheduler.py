@@ -196,8 +196,8 @@ class Scheduler:
             должна начинаться, иначе False.
         """
         if task.start_at and time.time() < task.start_at:
-            logger.info('Задача %s отложена. Время начала ещё не наступило.', 
-                  task.id)
+            logger.info('Задача %s отложена. Время начала ещё не наступило.',
+                        task.id)
             queue.rotate(1)
             return True
         return False
@@ -221,7 +221,7 @@ class Scheduler:
         )
         if not dependencies_completed:
             logger.info(f'Задача {task.id} отложена из-за '
-                         'невыполненных зависимостей.')
+                        'невыполненных зависимостей.')
             task.status = JobStatus.POSTPONED
             queue.rotate(1)
             return True
