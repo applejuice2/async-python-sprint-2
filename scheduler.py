@@ -93,8 +93,6 @@ class Scheduler:
                     or self.__dependencies_not_complete(task, self.queue)):
                 continue
 
-            self.__set_task_status_to_started(task)
-
             try:
                 logger.info('Выполнение %s', task.id)
                 task.run()
@@ -231,17 +229,6 @@ class Scheduler:
             queue.rotate(1)
             return True
         return False
-
-    @staticmethod
-    def __set_task_status_to_started(task: Job) -> None:
-        """
-        Устанавливает статус задачи в "STARTED", если она ещё не была начата.
-
-        Args:
-            task (Job): Задача для изменения статуса.
-        """
-        if task.status != JobStatus.STARTED:
-            task.status = JobStatus.STARTED
 
     def __delete_dependency_task_from_map(self, task: Job) -> None:
         """

@@ -88,6 +88,7 @@ class Job:
 
     @measure_execution_time
     def run(self):
+        self.status = JobStatus.STARTED
         self.coroutine.send(None)
 
     def pause(self):
