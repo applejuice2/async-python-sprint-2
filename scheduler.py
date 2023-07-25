@@ -2,6 +2,9 @@ import pickle
 import time
 from collections import deque
 from uuid import UUID
+from typing import Generator
+
+import requests
 
 from job import (Job,
                  JobStatus)
@@ -26,7 +29,7 @@ class Scheduler:
         file (str): Путь к файлу для сохранения состояния планировщика.
     """
 
-    def __init__(self, pool_size=10, file='jobs.pkl'):
+    def __init__(self, pool_size: int = 10, file: str = 'jobs.pkl'):
         self.queue: deque[Job] = deque(maxlen=pool_size)
         self.file: str = file
         self.dependency_map = {}
@@ -71,15 +74,15 @@ class Scheduler:
         Raises:
             QueueFullOfElems: Если очередь задач полна.
         """
-        if len(self.queue) < self.queue.maxlen:
-            self.queue.appendleft(task)
-            logger.info('%s добавлена в очередь', task.id)
-            if task.dependencies:
-                self.__start_dependency_service(task, self.dependency_map)
-        else:
+        if len(self.queue) >= self.queue.maxlen:
             raise QueueFullOfElems
 
-    def run(self) -> None:
+        self.queue.appendleft(task)
+        logger.info('%s добавлена в очередь', task.id)
+        if task.dependencies:
+            self.__start_dependency_service(task, self.dependency_map)
+
+    def run(self) -> Generator[None, None, None]:
         """
         Основной метод для исполнения всех задач в очереди.
         """
@@ -101,7 +104,9 @@ class Scheduler:
                 self.queue.pop()
                 yield
                 continue
-            except (TaskTimeLimitError, Exception) as e:
+            except (TaskTimeLimitError,
+                    requests.ConnectionError,
+                    Exception) as e:
                 if task.max_restarts > task.restarts:
                     task.restarts += 1
                     self.queue.rotate(1)
@@ -216,8 +221,8 @@ class Scheduler:
             задачи не завершены, иначе False.
         """
         dependencies_completed = all(
-            [status in [JobStatus.FINISHED, JobStatus.FAILED]
-             for status in task.dependency_statuses.values()]
+            status in (JobStatus.FINISHED, JobStatus.FAILED)
+            for status in task.dependency_statuses.values()
         )
         if not dependencies_completed:
             logger.info(f'Задача {task.id} отложена из-за '

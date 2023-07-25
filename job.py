@@ -1,5 +1,5 @@
 from typing import (Optional,
-                    Generator)
+                    Callable)
 from enum import Enum
 from uuid import (UUID,
                   uuid4)
@@ -57,7 +57,7 @@ class Job:
     """
 
     def __init__(self,
-                 target: Generator,
+                 target: Callable,
                  id: Optional[UUID] = None,
                  args: Optional[tuple] = None,
                  kwargs: Optional[dict] = None,
@@ -67,7 +67,7 @@ class Job:
                  restarts: int = 0,
                  max_restarts: int = 0,
                  dependencies: Optional[list[UUID]] = None,
-                 dependency_statuses: dict[UUID, JobStatus] = None,
+                 dependency_statuses: Optional[dict[UUID, JobStatus]] = None,
                  status: JobStatus = JobStatus.NOT_STARTED) -> None:
 
         self.id = id or uuid4()
