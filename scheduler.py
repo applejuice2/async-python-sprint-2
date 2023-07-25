@@ -48,7 +48,7 @@ class Scheduler:
 
         while idx < len(tasks):
             try:
-                self.__schedule(tasks[idx])
+                self.schedule(tasks[idx])
                 # Индекс инкрементируется после успешного добавления задачи.
                 idx += 1
             except QueueFullOfElems:
@@ -63,7 +63,7 @@ class Scheduler:
         for _ in self.run():
             pass
 
-    def __schedule(self, task: Job) -> None:
+    def schedule(self, task: Job) -> None:
         """
         Добавляет задачу в очередь на выполнение.
         Если задача имеет зависимости, инициирует службу зависимостей.
@@ -129,7 +129,7 @@ class Scheduler:
 
         for task in loaded_tasks:
             task.status = JobStatus.NOT_STARTED
-            self.__schedule(task)
+            self.schedule(task)
 
         self.run()
 

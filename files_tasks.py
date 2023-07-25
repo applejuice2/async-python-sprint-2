@@ -15,7 +15,7 @@ def task_1():
 def task_2():
     """Чтение данных из файла"""
     with open('file1.txt', 'r') as f:
-        print(f.read())
+        f.read()
         yield
 
 
@@ -57,7 +57,7 @@ def task_8():
     """Чтение из множества файлов"""
     for i in range(5):
         with open(f'file_{i}.txt', 'r') as f:
-            print(f.read())
+            f.read()
             yield
 
 
@@ -78,48 +78,38 @@ def task_10():
 
 def main():
     job1 = Job(target=task_1,
-               max_running_time=5,
-               id=1)
+               max_running_time=5)
     job2 = Job(target=task_2,
                max_running_time=5,
-               dependencies=[job1.id],
-               id=2)
+               dependencies=[job1.id])
     job3 = Job(target=task_3,
                max_running_time=5,
-               dependencies=[job1.id],
-               id=3)
+               dependencies=[job1.id])
     job4 = Job(target=task_4,
                max_running_time=5,
-               dependencies=[job1.id],
-               id=4)
+               dependencies=[job1.id])
     job5 = Job(target=task_5,
                max_running_time=5,
-               dependencies=[job4.id],
-               id=5)
+               dependencies=[job4.id])
     job6 = Job(target=task_6,
                max_running_time=0.1,
-               dependencies=[job1.id],
-               id=6)
+               dependencies=[job1.id])
     job7 = Job(target=task_7,
-               max_running_time=10,
-               id=7)
+               max_running_time=10)
     job8 = Job(target=task_8,
                max_running_time=7,
-               dependencies=[job7.id],
-               id=8)
+               dependencies=[job7.id])
     job9 = Job(target=task_9,
                max_running_time=8,
-               dependencies=[job7.id],
-               id=9)
+               dependencies=[job7.id])
     job10 = Job(target=task_10,
                 max_running_time=0.1,
-                dependencies=[job7.id],
-                id=10)
+                dependencies=[job7.id])
 
     scheduler = Scheduler(pool_size=10)
-    task_list = [job1, job2, job3, job4, job5, job6, job7, job8, job9, job10]
+    tasks = (job1, job2, job3, job4, job5, job6, job7, job8, job9, job10)
 
-    scheduler.process_all_tasks(task_list)
+    scheduler.process_all_tasks(tasks)
 
 
 if __name__ == '__main__':

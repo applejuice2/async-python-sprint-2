@@ -49,38 +49,31 @@ def task_7():
 def main():
     # будет работать 3 секунды, но лимит 5 секунд, все ок
     job1 = Job(target=task_1,
-               max_running_time=5,
-               id=1)
+               max_running_time=5)
     # будет работать 3 секунды, лимит 6 секунд, все ок
     job2 = Job(target=task_2,
-               max_running_time=6,
-               id=2)
+               max_running_time=6)
     # зависит от job1 и job2, будет работать 4 секунды, но лимит 3 секунды
     job3 = Job(target=task_3,
                max_running_time=3,
-               dependencies=[job1.id, job2.id],
-               id=3)
+               dependencies=[job1.id, job2.id])
     # будет работать 1 секунду, но лимит 2 секунды, все ок
     job4 = Job(target=task_4,
-               max_running_time=2,
-               id=4)
+               max_running_time=2)
     # будет работать 2 секунды, лимит 3 секунды, все ок
     job5 = Job(target=task_5,
-               max_running_time=3,
-               id=5)
+               max_running_time=3)
     # будет работать 4.5 секунды, лимит 6 секунды, все ок
     job6 = Job(target=task_6,
-               max_running_time=6,
-               id=6)
+               max_running_time=6)
     # будет работать 2 секунды, лимит 3 секунды, все ок
     job7 = Job(target=task_7,
-               max_running_time=3,
-               id=7)
+               max_running_time=3)
 
     scheduler = Scheduler(pool_size=3)
-    task_list = [job1, job2, job3, job4, job5, job6, job7]
+    tasks = (job1, job2, job3, job4, job5, job6, job7)
 
-    scheduler.process_all_tasks(task_list)
+    scheduler.process_all_tasks(tasks)
 
 
 if __name__ == '__main__':

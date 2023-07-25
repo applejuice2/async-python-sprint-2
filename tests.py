@@ -100,7 +100,7 @@ class TestScheduler(unittest.TestCase):
         self.assertEqual(len(self.scheduler.dependency_map), 0)
 
     def test_schedule_single_task(self):
-        self.scheduler._Scheduler__schedule(self.mock_job)
+        self.scheduler.schedule(self.mock_job)
         self.assertEqual(len(self.scheduler.queue), 1)
 
     def test_process_all_tasks(self):
@@ -114,7 +114,7 @@ class TestScheduler(unittest.TestCase):
         self.scheduler.queue = mock_queue
         self.scheduler.queue.appendleft = Mock(side_effect=QueueFullOfElems)
         with self.assertRaises(QueueFullOfElems):
-            self.scheduler._Scheduler__schedule(self.mock_job)
+            self.scheduler.schedule(self.mock_job)
 
     def test_stop(self):
         with patch('builtins.open', unittest.mock.mock_open()) as mock_open:

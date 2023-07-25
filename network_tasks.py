@@ -14,7 +14,7 @@ def task_2():
     """Обработка ответа от API"""
     data = requests.get("https://jsonplaceholder.typicode.com/todos/2")
     yield
-    print("Received data:", data)
+    data.json()
     yield
 
 
@@ -25,14 +25,14 @@ def task_3():
             "https://jsonplaceholder.typicode.com/todos/4"]
     for url in urls:
         response = requests.get(url)
-        print(response.json())
+        response.json()
         yield
 
 
 def task_4():
     """Запрос с задержкой"""
     response = requests.get("https://httpbin.org/delay/2")
-    print(response.json())
+    response.json()
     yield
 
 
@@ -45,43 +45,40 @@ def task_5():
 
 
 def task_6():
-    """Запрос к несуществующему серверу"""
-    try:
-        requests.get("http://thisurldoesnotexist.xyz")
-    except requests.ConnectionError:
-        print("Connection Error!")
+    """Запрос к несуществующему серверу (Ошибку обработает Планировщик)"""
+    requests.get("http://thisurldoesnotexist.xyz")
     yield
 
 
 def task_7():
     """Запрос с анализом заголовков"""
     response = requests.get("https://jsonplaceholder.typicode.com/todos/1")
-    print(response.headers.get("Content-Type"))
+    response.headers.get("Content-Type")
     yield
 
 
 def task_8():
     """Отправка данных на сервер (POST-запрос)"""
     response = requests.post("https://httpbin.org/post", data={"key": "value"})
-    print(response.json())
+    response.json()
     yield
 
 
 def main():
-    job1 = Job(target=task_1, max_running_time=5, id=1)
-    job2 = Job(target=task_2, max_running_time=5, dependencies=[job1.id], id=2)
-    job3 = Job(target=task_3, max_running_time=10, id=3)
+    job1 = Job(target=task_1, max_running_time=5)
+    job2 = Job(target=task_2, max_running_time=5, dependencies=[job1.id])
+    job3 = Job(target=task_3, max_running_time=10)
     # Эта завершится с ошибкой из-за задержки в 2 секунды
-    job4 = Job(target=task_4, max_running_time=1, id=4)
-    job5 = Job(target=task_5, max_running_time=10, id=5)
-    job6 = Job(target=task_6, max_running_time=5, id=6)
-    job7 = Job(target=task_7, max_running_time=5, id=7)
-    job8 = Job(target=task_8, max_running_time=5, id=8)
+    job4 = Job(target=task_4, max_running_time=1)
+    job5 = Job(target=task_5, max_running_time=10)
+    job6 = Job(target=task_6, max_running_time=5)
+    job7 = Job(target=task_7, max_running_time=5)
+    job8 = Job(target=task_8, max_running_time=5)
 
     scheduler = Scheduler(pool_size=8)
-    task_list = [job1, job2, job3, job4, job5, job6, job7, job8]
+    tasks = (job1, job2, job3, job4, job5, job6, job7, job8)
 
-    scheduler.process_all_tasks(task_list)
+    scheduler.process_all_tasks(tasks)
 
 
 if __name__ == '__main__':
